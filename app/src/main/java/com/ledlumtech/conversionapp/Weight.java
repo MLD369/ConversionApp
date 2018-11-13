@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +33,7 @@ public class Weight extends AppCompatActivity {
 
         // assign variable to xml layout
         editText = findViewById(R.id.editText);
+        editText.addTextChangedListener(editTextWatcher);
         unitText = findViewById(R.id.unit);
         result = findViewById(R.id.result);
         calculate = findViewById(R.id.calculate);
@@ -83,6 +86,10 @@ public class Weight extends AppCompatActivity {
             unitText.setText(R.string.kg);
         }
 
+        if(editText.getText().toString().trim().length() != 0 )
+        {
+            convert();
+        }
         // display a toast to show that the radio button has been changed
         Toast.makeText(this,"Selected to convert from " + radioButton.getText(),Toast.LENGTH_SHORT).show();
     }// end of radio button click method
@@ -92,7 +99,7 @@ public class Weight extends AppCompatActivity {
 
         // convert the user input into a double
         double weight = Double.parseDouble(editText.getText().toString());
-        String text;
+
 
 
 
@@ -100,19 +107,52 @@ public class Weight extends AppCompatActivity {
         // converted answer
         if(radioGroup.getCheckedRadioButtonId() != Integer.valueOf(R.id.pounds))
         {
-            text =editText.getText().toString() + unitText.getText().toString() + " = " + String.format("%.2f",(weight * 2.2046)) + "lbs";
-            // set result with the user text , unit text , and the calculated value and units
-            result.setText(text);
+           calculatePounds(weight);
         }
         else
         {
-            text = editText.getText().toString() + unitText.getText().toString() + " = " + String.format("%.2f",(weight/2.2046)) +"kg";
-            // set result with the user text , unit text , and the calculated value and units
-            result.setText(text);
+            calculateKilograms(weight);
+
         }// end if
 
     }// end of convert method
 
+    // instantly calculate when text changes
+    private final TextWatcher editTextWatcher = new TextWatcher() {
+        @Override
+        public void onTextChanged(CharSequence s, int start,int before, int count) {
+            try {
+                convert();
+            }
+            catch (NumberFormatException e) {
+                result.setText("");
+
+            }
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) { }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+    };
+
+    private void calculatePounds(double weight)
+    {
+        String text;
+        text =editText.getText().toString() + unitText.getText().toString() + " = " + String.format("%.2f",(weight * 2.2046)) + "lbs";
+        // set result with the user text , unit text , and the calculated value and units
+        result.setText(text);
+    }
+
+    private void calculateKilograms(double weight)
+    {
+        String text;
+        text = editText.getText().toString() + unitText.getText().toString() + " = " + String.format("%.2f",(weight/2.2046)) +"kg";
+        // set result with the user text , unit text , and the calculated value and units
+        result.setText(text);
+    }
 
     // pass intent from any activity to this activity
     // lets this activities make itself in other activity

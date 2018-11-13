@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +35,7 @@ public class Volume extends AppCompatActivity {
 
         // assign variable to xml layout
         editText = findViewById(R.id.editText);
+        editText.addTextChangedListener(editTextWatcher);
         unitText = findViewById(R.id.unit);
         result = findViewById(R.id.result);
         calculate = findViewById(R.id.calculate);
@@ -85,6 +88,10 @@ public class Volume extends AppCompatActivity {
             unitText.setText(R.string.l);
         }
 
+        if(editText.getText().toString().trim().length() != 0 )
+        {
+            convert();
+        }
         // display a toast to show that the radio button has been changed
         Toast.makeText(this,"Selected to convert from " + radioButton.getText(),Toast.LENGTH_SHORT).show();
     }// end of radio button click method
@@ -103,20 +110,52 @@ public class Volume extends AppCompatActivity {
         // converted answer
         if(radioGroup.getCheckedRadioButtonId() != Integer.valueOf(R.id.gallons))
         {
-            // set string to set text
-             text = editText.getText().toString() + unitText.getText().toString() + " = " +String.format("%.2f", (volume/3.7854)) + "gal.";
-            // set result with the user text , unit text , and the calculated value and units
-            result.setText(text);
+          calculateGallons(volume);
         }
         else
         {
-            // set string to set text
-             text = editText.getText().toString() + unitText.getText().toString() + " = " + String.format("%.2f",(volume * 3.7854)) +"L";
-            // set result with the user text , unit text , and the calculated value and units
-            result.setText(text);
+           calculateLiter(volume);
         }// end if
 
     }// end of convert method
+
+    private final TextWatcher editTextWatcher = new TextWatcher() {
+        @Override
+        public void onTextChanged(CharSequence s, int start,int before, int count) {
+            try {
+                convert();
+            }
+            catch (NumberFormatException e) {
+                result.setText("");
+
+            }
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) { }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+    };
+
+    private void calculateGallons(double volume )
+    {
+        String text;
+        // set string to set text
+        text = editText.getText().toString() + unitText.getText().toString() + " = " +String.format("%.2f", (volume/3.7854)) + "gal.";
+        // set result with the user text , unit text , and the calculated value and units
+        result.setText(text);
+    }
+
+    private void calculateLiter(double  volume)
+    {
+        String text;
+        // set string to set text
+        text = editText.getText().toString() + unitText.getText().toString() + " = " + String.format("%.2f",(volume * 3.7854)) +"L";
+        // set result with the user text , unit text , and the calculated value and units
+        result.setText(text);
+    }
 
 
     // pass intent from any activity to this activity
